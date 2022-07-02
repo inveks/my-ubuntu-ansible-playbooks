@@ -1,0 +1,13 @@
+- include_tasks: desktop.yml
+- include_tasks: firefox.yml
+- include_tasks: keepassxc.yml
+- include_tasks: code.yml
+- include_tasks: meld.yml
+- include_tasks: wireshark.yml
+- include_tasks: virt-manager.yml
+- include_tasks: remmina.yml
+- include_tasks: vlc.yml
+- include_tasks: gimp.yml
+- include_tasks: inkscape.yml
+- include_tasks: obs-studio.yml
+- include_tasks: favorites.yml

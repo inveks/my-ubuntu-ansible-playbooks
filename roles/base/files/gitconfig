@@ -1,0 +1,9 @@
+[user]
+name = Benjamin Dev
+email = benjophp@gmail.com
+
+[push]
+default = simple
+
+[core]
+autocrlf = false

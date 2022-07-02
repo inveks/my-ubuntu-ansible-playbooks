@@ -1,0 +1,31 @@
+- hosts:
+    - all
+  gather_facts: true
+  become: true
+  roles:
+    - upgrade
+    - lms
+    - dns
+    - base
+    - cfssl
+    - role: kvm
+      when: "'kvm' in ansible_virtualization_tech_host"
+    - docker
+    - powershell
+    - yq
+    - talosctl
+    - k8s-client
+    - azure-client
+    - packer
+    - terraform
+    - vagrant
+    - go
+    - dotnet-sdk
+    - cue
+    - dagger
+    - syft
+    - grype
+    - kind
+    #- k3d   # TODO understand why we cannot access a metallb LoadBalancer IP from the host.
+    #- talos # TODO understand why we cannot access a metallb LoadBalancer IP from the host.
+    - desktop

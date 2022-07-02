@@ -1,0 +1,62 @@
+- name: Ensure apt-get can use https repositories
+  apt:
+    name:
+      - apt-transport-https
+      - gnupg
+
+- name: Add the hashicorp apt key
+  apt_key:
+    url: https://apt.releases.hashicorp.com/gpg
+
+# see https://www.terraform.io/downloads
+- name: Add the hashicorp repository
+  apt_repository:
+    repo: deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main
+
+# see https://www.terraform.io/downloads
+# see https://github.com/hashicorp/terraform/releases
+# NB execute apt-cache madison terraform to known the available versions.
+- name: Install terraform
+  block:
+    - name: Install terraform
+      apt:
+        name: terraform={{ terraform_version }}
+        allow_change_held_packages: true
+    - name: Pin terraform
+      dpkg_selections:
+        name: terraform
+        selection: hold
+
+# see https://github.com/nbering/terraform-inventory
+- name: Install terraform inventory
+  block:
+    - name: Create the /etc/ansible directory
+      file:
+        name: /etc/ansible
+        state: directory
+    - name: Check terraform inventory version
+      lineinfile:
+        path: /etc/ansible/terraform.py
+        line: '# version={{ terraform_inventory_version }}'
+        create: true
+      diff: false
+      check_mode: true
+      register: check
+    - name: Install terraform inventory
+      block:
+        - name: Install terraform inventory
+          get_url:
+            url: "https://github.com/nbering/terraform-inventory/releases/download/v{{ terraform_inventory_version }}/terraform.py"
+            dest: /etc/ansible/terraform.py
+            mode: 0755
+            force: true
+        - name: Patch terraform inventory
+          ansible.posix.patch:
+            src: terraform-inventory.patch
+            basedir: /etc/ansible
+        - name: Add terraform inventory version
+          lineinfile:
+            path: /etc/ansible/terraform.py
+            insertafter: '^#!'
+            line: '# version={{ terraform_inventory_version }}'
+      when: check.changed
